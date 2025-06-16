@@ -16,8 +16,6 @@ canvas {
   top: 10px;
   right: 10px;
   z-index: 10;
-  display: flex;
-  gap: 10px;
 }
 
 .controls button {
@@ -29,7 +27,6 @@ canvas {
   font-weight: bold;
   cursor: pointer;
   font-size: 14px;
-  white-space: nowrap;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -38,7 +35,8 @@ canvas {
   box-shadow: 0 0 10px #00ffe7;
 }
 
-#gameOverOverlay {
+#gameOverOverlay,
+#stageCompleteOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -55,7 +53,8 @@ canvas {
   display: none;
 }
 
-#gameOverOverlay button {
+#gameOverOverlay button,
+#stageCompleteOverlay button {
   margin-top: 20px;
   padding: 10px 20px;
   font-size: 18px;
