@@ -1,29 +1,25 @@
-/* Remove default margin/padding and hide overflow */
 body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: #000; /* Game background */
+  background: #000;
 }
 
-/* Make canvas full screen */
 canvas {
   display: block;
   width: 100vw;
   height: 100vh;
 }
 
-/* Controls container: fixed top-right with horizontal button alignment */
 .controls {
   position: fixed;
   top: 10px;
   right: 10px;
   z-index: 10;
   display: flex;
-  gap: 10px; /* space between buttons */
+  gap: 10px;
 }
 
-/* Button styling */
 .controls button {
   padding: 10px 20px;
   background: linear-gradient(45deg, #ff007f, #00ffe7);
@@ -33,12 +29,34 @@ canvas {
   font-weight: bold;
   cursor: pointer;
   font-size: 14px;
-  white-space: nowrap; /* Prevent text from wrapping */
+  white-space: nowrap;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* Button hover effect */
 .controls button:hover {
   transform: scale(1.1);
   box-shadow: 0 0 10px #00ffe7;
+}
+
+#gameOverOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 20;
+  display: none;
+}
+
+#gameOverOverlay button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 18px;
 }
