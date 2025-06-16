@@ -12,12 +12,16 @@
 
 <div class="controls">
   <button id="restartBtn">Restart</button>
-  <button id="nextStageBtn" disabled>Next Stage</button>
 </div>
 
 <div id="gameOverOverlay">
-  <div id="gameOverText">Game Over! Stage 1</div>
+  <div id="gameOverText">Game Over!</div>
   <button onclick="restartGame()">Play Again</button>
+</div>
+
+<div id="stageCompleteOverlay">
+  <div id="stageCompleteText">Congratulations! Stage Passed</div>
+  <button onclick="nextStage()">Go to Next Stage</button>
 </div>
 
 <script src="script.js"></script>
