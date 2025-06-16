@@ -2,233 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Breakout Game</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #000;
-    }
-
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    .controls {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 10;
-    }
-
-    .controls button {
-      padding: 10px 20px;
-      margin-left: 5px;
-      background: linear-gradient(45deg, #ff007f, #00ffe7);
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .controls button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 10px #00ffe7;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="controls">
-    <button id="restartBtn">Restart</button>
-    <button id="nextStageBtn" disabled>Next Stage</button>
-  </div>
+<canvas id="gameCanvas"></canvas>
 
-  <canvas id="gameCanvas"></canvas>
+<div class="controls">
+  <button id="restartBtn">Restart</button>
+  <button id="nextStageBtn" disabled>Next Stage</button>
+</div>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+<div id="gameOverOverlay">
+  <div id="gameOverText">Game Over! Stage 1</div>
+  <button onclick="restartGame()">Play Again</button>
+</div>
 
-    let ballRadius = 10;
-    let paddleHeight = 12;
-    let paddleWidth = 100;
-    let paddleX;
-    let x, y, dx, dy;
-    let rightPressed = false;
-    let leftPressed = false;
-    let brickRowCount = 3;
-    let brickColumnCount = 7;
-    let brickWidth = 75;
-    let brickHeight = 20;
-    let brickPadding = 15;
-    let brickOffsetTop = 50;
-    let brickOffsetLeft;
-    let bricks = [];
-    let stage = 1;
-    let maxStages = 5;
-    let animationId;
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      paddleX = (canvas.width - paddleWidth) / 2;
-      calculateBrickOffset();
-      resetBall();
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    function calculateBrickOffset() {
-      const totalBrickWidth = brickColumnCount * (brickWidth + brickPadding) - brickPadding;
-      brickOffsetLeft = Math.max((canvas.width - totalBrickWidth) / 2, 10);
-    }
-
-    function createBricks() {
-      bricks = [];
-      for (let c = 0; c < brickColumnCount; c++) {
-        bricks[c] = [];
-        for (let r = 0; r < brickRowCount; r++) {
-          bricks[c][r] = { x: 0, y: 0, status: 1 };
-        }
-      }
-    }
-
-    function resetBall() {
-      x = canvas.width / 2;
-      y = canvas.height - 30;
-      dx = 3 + stage;
-      dy = -(3 + stage);
-    }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
-      else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
-    });
-
-    document.addEventListener("keyup", (e) => {
-      if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
-      else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
-    });
-
-    document.getElementById("restartBtn").addEventListener("click", restartGame);
-    document.getElementById("nextStageBtn").addEventListener("click", nextStage);
-
-    createBricks();
-
-    function drawBall() {
-      ctx.beginPath();
-      ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-      ctx.fillStyle = "#00ffe7";
-      ctx.fill();
-      ctx.closePath();
-    }
-
-    function drawPaddle() {
-      ctx.beginPath();
-      ctx.rect(paddleX, canvas.height - paddleHeight - 5, paddleWidth, paddleHeight);
-      ctx.fillStyle = "#ff007f";
-      ctx.fill();
-      ctx.closePath();
-    }
-
-    function drawBricks() {
-      for (let c = 0; c < brickColumnCount; c++) {
-        for (let r = 0; r < brickRowCount; r++) {
-          if (bricks[c][r].status === 1) {
-            let brickX = brickOffsetLeft + c * (brickWidth + brickPadding);
-            let brickY = brickOffsetTop + r * (brickHeight + brickPadding);
-            bricks[c][r].x = brickX;
-            bricks[c][r].y = brickY;
-            ctx.beginPath();
-            ctx.rect(brickX, brickY, brickWidth, brickHeight);
-            ctx.fillStyle = `hsl(${(c * 60) + (r * 20)}, 80%, 50%)`;
-            ctx.fill();
-            ctx.closePath();
-          }
-        }
-      }
-    }
-
-    function collisionDetection() {
-      let remaining = 0;
-      for (let c = 0; c < brickColumnCount; c++) {
-        for (let r = 0; r < brickRowCount; r++) {
-          let b = bricks[c][r];
-          if (b.status === 1) {
-            remaining++;
-            if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
-              dy = -dy;
-              b.status = 0;
-            }
-          }
-        }
-      }
-      if (remaining === 0) {
-        document.getElementById("nextStageBtn").disabled = false;
-        cancelAnimationFrame(animationId);
-      }
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawBricks();
-      drawBall();
-      drawPaddle();
-      collisionDetection();
-
-      if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) dx = -dx;
-      if (y + dy < ballRadius) dy = -dy;
-      else if (y + dy > canvas.height - ballRadius - paddleHeight) {
-        if (x > paddleX && x < paddleX + paddleWidth) dy = -dy;
-        else if (y + dy > canvas.height - ballRadius) {
-          alert("GAME OVER! Stage: " + stage);
-          document.location.reload();
-        }
-      }
-
-      x += dx;
-      y += dy;
-
-      if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 8;
-      else if (leftPressed && paddleX > 0) paddleX -= 8;
-
-      animationId = requestAnimationFrame(draw);
-    }
-
-    function restartGame() {
-      stage = 1;
-      resetStage();
-    }
-
-    function nextStage() {
-      if (stage < maxStages) {
-        stage++;
-        resetStage();
-      } else {
-        alert("🎉 Congratulations! You completed all stages!");
-        document.location.reload();
-      }
-    }
-
-    function resetStage() {
-      brickRowCount = 3 + stage;
-      brickColumnCount = 6 + Math.floor(stage / 2);
-      createBricks();
-      calculateBrickOffset();
-      resetBall();
-      document.getElementById("nextStageBtn").disabled = true;
-      cancelAnimationFrame(animationId);
-      animationId = requestAnimationFrame(draw);
-    }
-
-    animationId = requestAnimationFrame(draw);
-  </script>
+<script src="script.js"></script>
 </body>
 </html>
