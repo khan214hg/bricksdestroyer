@@ -26,20 +26,29 @@ resizeCanvas();
 
 document.getElementById("restartBtn").addEventListener("click", restartGame);
 
-// Touch swipe for paddle
+// Smooth swipe for paddle
+let lastTouchX = null;
+canvas.addEventListener("touchstart", function(e) {
+  lastTouchX = e.touches[0].clientX;
+});
 canvas.addEventListener("touchmove", function(e) {
-  let touchX = e.touches[0].clientX;
-  paddleX = touchX - paddleWidth / 2;
-  if (paddleX < 0) paddleX = 0;
-  if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+  if (lastTouchX !== null) {
+    let touchX = e.touches[0].clientX;
+    let diffX = touchX - lastTouchX;
+    paddleX += diffX;
+    if (paddleX < 0) paddleX = 0;
+    if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+    lastTouchX = touchX;
+  }
+  e.preventDefault();
 });
 
 function initGame() {
   ballRadius = 10;
   ballX = canvas.width / 2;
   ballY = canvas.height - 30;
-  ballDX = 4 + stage;  // Difficulty increases
-  ballDY = -(4 + stage);
+  ballDX = (2 + stage * 0.5); // slower speed
+  ballDY = -(2 + stage * 0.5); // slower speed
   createBricks();
 }
 
@@ -55,7 +64,7 @@ function createBricks() {
 
 function drawBall() {
   ctx.beginPath();
-  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI*2);
+  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
   ctx.fillStyle = "#00ffe7";
   ctx.fill();
   ctx.closePath();
@@ -119,13 +128,13 @@ function draw() {
   drawPaddle();
   collisionDetection();
 
-  if(ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
+  if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) {
     ballDX = -ballDX;
   }
-  if(ballY + ballDY < ballRadius) {
+  if (ballY + ballDY < ballRadius) {
     ballDY = -ballDY;
-  } else if(ballY + ballDY > canvas.height - ballRadius - paddleHeight - 10) {
-    if(ballX > paddleX && ballX < paddleX + paddleWidth) {
+  } else if (ballY + ballDY > canvas.height - ballRadius - paddleHeight - 10) {
+    if (ballX > paddleX && ballX < paddleX + paddleWidth) {
       ballDY = -ballDY;
     } else if (ballY + ballDY > canvas.height - ballRadius) {
       document.getElementById("gameOverOverlay").style.display = "flex";
